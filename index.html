@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文阅读笔记</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-book-open"></i>
+                    <h2>论文笔记</h2>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="搜索论文...">
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <h3><i class="fas fa-folder"></i> 论文分类</h3>
+                    <ul class="paper-list" id="paperList">
+                        <!-- 动态加载的论文列表 -->
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3><i class="fas fa-plus-circle"></i> 管理</h3>
+                    <ul class="action-list">
+                        <li><a href="#" id="addPaperBtn"><i class="fas fa-plus"></i> 添加新论文</a></li>
+                        <li><a href="#" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新列表</a></li>
+                        <li><a href="#" id="setUncatBtn"><i class="fas fa-pen"></i> 设置“未分类”名称</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-content">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb" id="breadcrumb">
+                        <i class="fas fa-home"></i>
+                        <span>首页</span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="theme-toggle" id="themeToggle" title="切换主题">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button class="fullscreen-btn" id="fullscreenBtn" title="全屏阅读">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- 欢迎页面 -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-content">
+                        <div class="welcome-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h1>欢迎来到论文阅读笔记</h1>
+                        <p>这里收录了精心整理的学术论文阅读笔记，帮助您快速理解和回顾重要的研究内容。</p>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <i class="fas fa-file-alt"></i>
+                                <div class="stat-info">
+                                    <h3 id="totalPapers">0</h3>
+                                    <p>论文总数</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-tags"></i>
+                                <div class="stat-info">
+                                    <h3 id="totalCategories">0</h3>
+                                    <p>分类数量</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-clock"></i>
+                                <div class="stat-info">
+                                    <h3>最近更新</h3>
+                                    <p id="lastUpdate">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quick-actions">
+                            <button class="action-btn primary" id="quickAddBtn">
+                                <i class="fas fa-plus"></i>
+                                添加新论文
+                            </button>
+                            <button class="action-btn secondary" id="browseBtn">
+                                <i class="fas fa-list"></i>
+                                浏览所有论文
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 论文内容显示区 -->
+                <div class="paper-content" id="paperContent" style="display: none;">
+                    <div class="paper-header">
+                        <h1 id="paperTitle">论文标题</h1>
+                        <div class="paper-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="paperDate">日期</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span id="paperCategory">分类</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-file-word"></i>
+                                <span id="wordCount">字数统计</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="paper-body" id="paperBody">
+                        <!-- Markdown 内容将在这里显示 -->
+                    </div>
+                </div>
+
+                <!-- 加载指示器 -->
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载...</p>
+                </div>
+
+                <!-- 错误提示 -->
+                <div class="error-message" id="errorMessage" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>加载失败</h3>
+                    <p id="errorText">无法加载论文内容，请稍后重试。</p>
+                    <button class="retry-btn" id="retryBtn">重试</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- 添加论文模态框 -->
+    <div class="modal" id="addPaperModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> 添加新论文</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="paperFileName">文件名 (不含.md后缀)</label>
+                    <input type="text" id="paperFileName" placeholder="例如: new-paper-note">
+                </div>
+                <div class="form-group">
+                    <label for="paperCategoryInput">子目录/分类 (可选)</label>
+                    <input type="text" id="paperCategoryInput" placeholder="例如: planning 或 cv/sfm">
+                </div>
+                <div class="form-group">
+                    <label for="paperTitleInput">论文标题</label>
+                    <input type="text" id="paperTitleInput" placeholder="输入论文标题">
+                </div>
+                <div class="instructions">
+                    <h4><i class="fas fa-info-circle"></i> 使用说明</h4>
+                    <ol>
+                        <li>在 <code>paper-notes/notes/</code> 目录下创建新的 .md 文件（可放入子目录，如 <code>paper-notes/notes/planning/your.md</code>）</li>
+                        <li>文件名应该简洁明了，使用英文和连字符</li>
+                        <li>在文件开头使用 <code># 标题</code> 或 YAML Front Matter（支持 <code>title</code> 与 <code>category</code>）设置元信息</li>
+                        <li>保存文件后点击刷新按钮即可在列表中看到</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" id="modalCancel">取消</button>
+                <button class="btn primary" id="modalConfirm">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- marked.js 渲染 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- MathJax v3 配置与脚本：支持 $...$ 与 $$...$$，并跳过代码块等标签 -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true,
+          processEnvironments: true,
+          tags: 'ams'
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'tex2jax_process'
+        },
+        chtml: { scale: 1.0 }
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+    <!-- 业务脚本 -->
+    <script src="./script.js"></script>
+</body>
+</html>
